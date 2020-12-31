@@ -23,3 +23,8 @@ There is definite scope for improvement in the area of MIDI note sequencing,
 which suffers from being a hasty transcipt of some much older stuff. However
 as it stands it is sufficient for the author's requirement, and avoids a
 substantial amount of overhead inherent in other libraries.
+
+At a lower level there is extra complexity, mostly hidden in include files,
+which results in the API being presented either as a statically-linked unit or
+as an object which conceals dynamic linkage. Conveniently, Pascal allows an
+application program to use identical calling syntax in both cases.
