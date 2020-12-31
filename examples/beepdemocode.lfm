@@ -1,0 +1,55 @@
+object BeepDemoForm: TBeepDemoForm
+  Left = 522
+  Height = 240
+  Top = 166
+  Width = 320
+  Caption = 'BeepDemoForm'
+  ClientHeight = 240
+  ClientWidth = 320
+  OnCreate = FormCreate
+  LCLVersion = '2.1.0.0'
+  object ButtonAlsaPcmBeep: TButton
+    Left = 16
+    Height = 33
+    Top = 160
+    Width = 132
+    Caption = 'ALSA PCM Beep'
+    OnClick = ButtonAlsaPcmBeepClick
+    TabOrder = 0
+  end
+  object ButtonStdoutBeep: TButton
+    Left = 16
+    Height = 31
+    Top = 72
+    Width = 132
+    Caption = 'Stdout Beep'
+    OnClick = ButtonStdoutBeepClick
+    TabOrder = 1
+  end
+  object Label1: TLabel
+    Left = 87
+    Height = 19
+    Top = 19
+    Width = 41
+    Caption = 'Label1'
+    ParentColor = False
+  end
+  object Button1X11Beep: TButton
+    Left = 164
+    Height = 31
+    Top = 72
+    Width = 132
+    Caption = 'X11 Beep'
+    OnClick = Button1X11BeepClick
+    TabOrder = 2
+  end
+  object ButtonAlsaSeqBeep: TButton
+    Left = 164
+    Height = 33
+    Top = 160
+    Width = 132
+    Caption = 'ALSA MIDI Beep'
+    OnClick = ButtonAlsaSeqBeepClick
+    TabOrder = 3
+  end
+end

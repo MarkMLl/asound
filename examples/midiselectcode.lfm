@@ -1,0 +1,64 @@
+object MidiSelectForm: TMidiSelectForm
+  Left = 128
+  Height = 267
+  Top = 128
+  Width = 558
+  Caption = 'Select MIDI Synthesiser Device'
+  ClientHeight = 267
+  ClientWidth = 558
+  LCLVersion = '2.1.0.0'
+  object RadioGroup1: TRadioGroup
+    Left = 31
+    Height = 200
+    Top = 14
+    Width = 496
+    Align = alClient
+    AutoFill = True
+    BorderSpacing.Left = 31
+    BorderSpacing.Top = 14
+    BorderSpacing.Right = 31
+    Caption = 'Synthesiser Devices'
+    ChildSizing.LeftRightSpacing = 6
+    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+    ChildSizing.EnlargeVertical = crsHomogenousChildResize
+    ChildSizing.ShrinkHorizontal = crsScaleChilds
+    ChildSizing.ShrinkVertical = crsScaleChilds
+    ChildSizing.Layout = cclLeftToRightThenTopToBottom
+    ChildSizing.ControlsPerLine = 1
+    ParentFont = False
+    TabOrder = 0
+  end
+  object PanelBottom: TPanel
+    Left = 0
+    Height = 53
+    Top = 214
+    Width = 558
+    Align = alBottom
+    BevelOuter = bvNone
+    ClientHeight = 53
+    ClientWidth = 558
+    ParentFont = False
+    TabOrder = 1
+    object ButtonOK: TButton
+      Left = 113
+      Height = 28
+      Top = 14
+      Width = 85
+      Caption = 'OK'
+      Default = True
+      ModalResult = 1
+      ParentFont = False
+      TabOrder = 0
+    end
+    object ButtonCancel: TButton
+      Left = 349
+      Height = 28
+      Top = 14
+      Width = 85
+      Caption = 'Cancel'
+      ModalResult = 2
+      ParentFont = False
+      TabOrder = 1
+    end
+  end
+end
