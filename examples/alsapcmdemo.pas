@@ -27,8 +27,11 @@ implementation
 
 {$define DYNAMIC }
 
-{$ifdef DYNAMIC }
 uses
+{$ifdef LCL }
+  Forms,
+{$endif LCL }
+{$ifdef DYNAMIC }
   AsoundPcm_dynamic;                    (* AsoundPcm (hence Asound) is an object *)
 {$else }
 uses
@@ -37,6 +40,7 @@ uses
 
 var
   SA: array[0..359] of byte;            // One cycle of precomputed sine wave
+  mainThreadID: TThreadID;
 
 
 (* Beep under DOS on an IBM PS/2-77 is 900Hz 660mS but I've "rounded" this here
@@ -86,7 +90,7 @@ begin
 (* Iterate the precomputed array into the output buffer, the number of times    *)
 (* being determined by the mSec parameter.                                      *)
 
-        for LC := 1 to (mSec * fraction) div 1000 do
+        for LC := 1 to (mSec * fraction) div 1000 do begin
           begin
 
 (* Transfer the precomputed array into the output buffer once.                  *)
@@ -110,7 +114,18 @@ begin
               WriteLn(AsoundPcm.snd_strerror(frames));
               break
             end
-          end
+          end;
+
+(* Assuming that the outer loop runs 20 times a second, if this is a GUI (as    *)
+(* distinct from console) application and we are running in the context of the  *)
+(* main thread then give the GUI a chance to handle any user interaction 10     *)
+(* times a second.                                                              *)
+
+{$ifdef LCL }
+          if Odd(LC) and (GetCurrentThreadID() = mainThreadID) then
+            Application.ProcessMessages
+{$endif LCL }
+        end
       else // snd_pcm_set_params() failed
         result := false
     finally
@@ -165,6 +180,7 @@ end { initAlsaPcm } ;                   // Breakpoint here to check max amplitud
 
 
 initialization
-  initAlsaPcm()
+  initAlsaPcm();
+  mainThreadID := GetCurrentThreadID
 end.
 
