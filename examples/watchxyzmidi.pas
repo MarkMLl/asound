@@ -609,7 +609,7 @@ end { TMidiWriterThread.ParseMidiAndEmit } ;
 function IsDynamic(): boolean;
 
 begin
-  AsoundSeq.IsDynamic
+  result := AsoundSeq.IsDynamic
 end { IsDynamic } ;
 
 
