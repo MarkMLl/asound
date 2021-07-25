@@ -170,8 +170,8 @@ begin
   result := 0;
   for I := 0 to 179 do begin
     SA[I] := 128 + round(first * sin(1 * pi * I / 180.0) * volume) +
-             128 + round(third * sin(3 * pi * I / 180.0) * volume) +
-             128 + round(fifth * sin(5 * pi * I / 180.0) * volume);
+                round(third * sin(3 * pi * I / 180.0) * volume) +
+                round(fifth * sin(5 * pi * I / 180.0) * volume);
     SA[I + 180] := 255 - SA[I];
     if SA[I] > result then
       result := SA[I]
