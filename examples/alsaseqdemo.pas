@@ -1,3 +1,5 @@
+(* Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FP *)
+
 unit AlsaSeqDemo;
 
 (* Demo beep for Linux using ALSA, with a simple MIDI sequence being passed to  *)
@@ -16,7 +18,6 @@ function BeepSeq(const tune: string= 'c050 !127 +660 A6'): boolean;
 
 (* Is the underlying ALSA library linked statically or dynamically?
 *)
-
 function IsDynamic(): boolean;
 
 
@@ -36,7 +37,7 @@ function BeepSeq(const tune: string= 'c050 !127 +660 A6'): boolean;
 
 begin
   if not hasInitialisedMidi then begin
-    MidiWriterThread := TMidiWriterThread.Create(false);
+    MidiWriterThread := TMidiWriterThread.Create(false, 'BeepDemo');
     Application.ProcessMessages;
 
 (* Hack here: because the code I've repurposed prompts the user for the MIDI    *)
@@ -53,7 +54,6 @@ end { BeepSeq } ;
 
 (* Is the underlying ALSA library linked statically or dynamically?
 *)
-
 function IsDynamic(): boolean;
 
 begin

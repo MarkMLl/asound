@@ -1,8 +1,8 @@
 // unit THIS LINE NEEDED FOR DECLARATION HINTING TO WORK
-(* Return either a static or a dynamic representation of the Asound embedding
-  library (libasound.a or similar). In this case it is static.
+(* Return either a static or a dynamic representation of the Filter_demo embedding
+  library (filter_demo.a or similar). In this case it is static.
 *)
-unit AsoundSeq;
+unit plugin;
 
 (********************************************************************************)
 (*                                                                              *)
@@ -14,25 +14,25 @@ unit AsoundSeq;
 {$packrecords C}
 
 (*
- * Please refer to AsoundSeqDefs.inc and other accompanying files for
+ * Please refer to plugin.inc and other accompanying files for
  * licensing and disclaimer information.
  *)
 
 interface
 
 uses
-  Classes, SysUtils, UnixType;
+  Classes, SysUtils, AsoundSeq;
 
 const
-  DefaultModuleName= 'libasound';
+  DefaultModuleName= 'filter_demo';
   DefaultEarlyLoad= true;
   HasLoadVarargsRoutine= true;          (* Presence is implementation-defined   *)
 
 const
-  (* The Asound libraries are statically linked, always return false.
+  (* The Filter_demo libraries are statically linked, always return false.
   *)
   IsDynamic= false;
-  (* The Asound libraries are statically linked, if the program has started
+  (* The Filter_demo libraries are statically linked, if the program has started
     successfully then they must be in memory.
   *)
   ModuleInMemory= true;
@@ -42,13 +42,13 @@ const
 {$undef TYPES   }
 {$undef PROCS   }
 {$undef VPROCS  }
-{$i AsoundSeqDefs.inc }
+{$i plugin.inc }
 
 {$undef CONSTS  }
 {$define TYPES  }
 {$undef PROCS   }
 {$undef VPROCS  }
-{$i AsoundSeqDefs.inc }
+{$i plugin.inc }
 
 {$push }
 {$macro on }
@@ -58,8 +58,8 @@ const
 {$define VPROCS }
 {$define CDECL__:= cdecl; }
 {$define CDECL_VARARGS__:= cdecl varargs; }
-{$define LIBASOUND__:= external 'libasound'; }
-{$i AsoundSeqDefs.inc }
+{$define PLUGIN__:= external 'filter_demo'; }
+{$i plugin.inc }
 {$pop }
 
 (* For a statically-linked program this has no effect.
@@ -80,15 +80,6 @@ procedure LoadVarargsRoutine(loadName: string= '';
                                         keepGoing: boolean= false);
 
 implementation
-
-
-(* Procedures and functions which are defined locally rather than being part of *)
-(* the external library, and which in C would often be implemented as macros,   *)
-(* are defined in this file to protect them from being overwritten.             *)
-
-{$define CLSASOUND__:=  }
-{$i AsoundSeq-macros.inc }
-
 
 {$push } {$hints off   Suppress hints about parameters being unused }
 

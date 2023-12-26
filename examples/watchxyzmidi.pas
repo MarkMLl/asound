@@ -1,4 +1,4 @@
-(* Lazarus+FPC 2.0.0+3.0.4 on Linux Lazarus+FPC 2.0.0+3.0.4 on Linux Lazarus+FP *)
+(* Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FP *)
 
 unit WatchXyzMidi;
 
@@ -19,7 +19,7 @@ unit WatchXyzMidi;
 
 interface
 
-{$define DYNAMIC }
+{$define DYNAMIC }                      (* Change as required                   *)
 
 uses
   Classes, SysUtils, SyncObjs,
@@ -29,6 +29,24 @@ uses
                         AsoundSeq
 {$endif DYNAMIC }
 ;
+
+(* This type and the constants that follow are a fiction to allow the MidiParse *)
+(* unit to not import the ALSA library in its entirety.                         *)
+
+type
+  snd_seq_event_t_= snd_seq_event_t;
+
+const
+  SND_SEQ_EVENT_NOTE_ = SND_SEQ_EVENT_NOTE;
+  SND_SEQ_EVENT_NOTEOFF_ = SND_SEQ_EVENT_NOTEOFF;
+  SND_SEQ_EVENT_NOTEON_ = SND_SEQ_EVENT_NOTEON;
+  SND_SEQ_EVENT_KEYPRESS_ = SND_SEQ_EVENT_KEYPRESS;
+  SND_SEQ_EVENT_CONTROLLER_ = SND_SEQ_EVENT_CONTROLLER;
+  SND_SEQ_EVENT_PGMCHANGE_ = SND_SEQ_EVENT_PGMCHANGE;
+  SND_SEQ_EVENT_CHANPRESS_ = SND_SEQ_EVENT_CHANPRESS;
+  SND_SEQ_EVENT_PITCHBEND_ = SND_SEQ_EVENT_PITCHBEND;
+  SND_SEQ_EVENT_SYSEX_ = SND_SEQ_EVENT_SYSEX;
+  SND_SEQ_EVENT_NONE_ = SND_SEQ_EVENT_NONE;
 
 type
   TSelectedDevice= class
@@ -43,6 +61,7 @@ type
       fLock: TCriticalSection;
       fEvent: TSimpleEvent;
       fDetentCount: integer;
+      fAppName: string;
       fQueue, fDeviceList: TStringList;
       fWarning: string;
       selectedDevice: TSelectedDevice;
@@ -96,14 +115,16 @@ type
         was originally PlayMidi() etc. in UtilXyz.
       *)
       function ParseMidiAndEmit(var txt: string): boolean;
+
     public
-      constructor Create(createSuspended: boolean);
+
+      constructor Create(createSuspended: boolean; const appName: string);
       destructor Destroy; override;
 
-    (* Enqueue a MIDI sequence to be played ASAP, but respecting any current
-      activity.
-    *)
-    procedure Enqueue(const midi: string);
+      (* Enqueue a MIDI sequence to be played ASAP, but respecting any current
+        activity.
+      *)
+      procedure Enqueue(const midi: string);
   end;
 
 (* Is the underlying ALSA library linked statically or dynamically?
@@ -123,9 +144,6 @@ implementation
 (* static and dynamic linkage.                                                  *)
 
 uses Forms, Dialogs, MidiSelectCode, MidiParse;
-
-const
-  clientName= 'WatchXyz';
 
 
 (* Tell the GUI thread to display a warning dialogue. This contains duplicated
@@ -222,13 +240,14 @@ begin
 end { TMidiWriterThread.Spin } ;
 
 
-constructor TMidiWriterThread.Create(createSuspended: boolean);
+constructor TMidiWriterThread.Create(createSuspended: boolean; const appName: string);
 
 begin
   inherited Create(createSuspended);
   fLock := TCriticalSection.Create;
   fEvent := TSimpleEvent.Create;
   fDetentCount := 0;
+  fAppName := appName;
   fQueue := TStringList.Create;
   fDeviceList := nil;
   selectedDevice := nil
@@ -286,7 +305,35 @@ var
   currentClient: integer;
   scratch: string;
 
+
+  procedure checkLibrary;
+
+  var
+    ev: snd_seq_event_t;
+
+  begin
+    if ASoundSeq.IsDynamic then
+      Write('Linkage is dynamic, ')
+    else
+      Write('Linkage is static, ');
+    if ASoundSeq.ModuleInMemory then
+      WriteLn('library is in memory')
+    else
+      WriteLn('library is not in memory');
+
+  (* The snd_seq_ev_is_reserved() function contains assertions checking that    *)
+  (* the content of an external variable appears sane.                          *)
+
+    FillByte(ev, SizeOf(ev), 0);
+    if ASoundSeq.snd_seq_ev_is_reserved(@ev) then
+      WriteLn('Zero is identified as a reserved event type')
+    else
+      WriteLn('Zero is not identified as a reserved event type')
+  end { testLibrary } ;
+
+
 begin
+  checkLibrary;
 
 (* Open the MIDI sequencer in order to enumerate a list of devices. Start off   *)
 (* with a check that the ALSA interface library is accessible, if this fails    *)
@@ -439,7 +486,7 @@ begin
     exit
   end;
   try
-    status := AsoundSeq.snd_seq_set_client_name(seqHandle, clientName);
+    status := AsoundSeq.snd_seq_set_client_name(seqHandle, PChar(fAppName));
     if status < 0 then begin
       Warning('Cannot set ALSA client name: ' + AsoundSeq.snd_strError(status));
       exit
@@ -459,7 +506,7 @@ begin
     try
       AsoundSeq.snd_seq_port_info_set_port(pinfo, 0); (* Defaults to 0, this for safety *)
       AsoundSeq.snd_seq_port_info_set_port_specified(pinfo, 1);
-      AsoundSeq.snd_seq_port_info_set_name(pinfo, clientName);
+      AsoundSeq.snd_seq_port_info_set_name(pinfo, PChar(fAppName));
       AsoundSeq.snd_seq_port_info_set_capability(pinfo, 0); (* Ditto            *)
       AsoundSeq.snd_seq_port_info_set_type(pinfo, SND_SEQ_PORT_TYPE_MIDI_GENERIC +
                                         SND_SEQ_PORT_TYPE_APPLICATION);
@@ -475,7 +522,7 @@ begin
 
 (* Create a queue.                                                              *)
 
-    seqQueue := AsoundSeq.snd_seq_alloc_named_queue(seqHandle, clientName);
+    seqQueue := AsoundSeq.snd_seq_alloc_named_queue(seqHandle, PChar(fAppName));
     if seqQueue < 0 then begin
       Warning('Cannot create ALSA queue: ' + AsoundSeq.snd_strError(seqQueue));
       exit
@@ -613,7 +660,5 @@ begin
 end { IsDynamic } ;
 
 
-initialization
-  Assert(InitMidiParser() = AsoundSeq.IsDynamic, 'Internal error: mixing static and dynamic ALSA linkage')
 end.
 

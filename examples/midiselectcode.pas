@@ -1,4 +1,4 @@
-(* Lazarus+FPC 2.0.0+3.0.4 on Linux Lazarus+FPC 2.0.0+3.0.4 on Linux Lazarus+FP *)
+(* Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FP *)
 
 unit MidiSelectCode;
 
@@ -50,6 +50,16 @@ var
   i: integer;
 
 begin
+
+(* A runtime error here might mean that the form has not been properly		*)
+(* created using a statement like						*)
+(*										*)
+(*	  Application.CreateForm(TMidiSelectForm, MidiSelectForm);		*)
+(*										*)
+(* in the main .lpr file. I have seen the Lazarus IDE remove this line when it	*)
+(* was governed by manually-inserted conditional compilation directives and the	*)
+(* controlling definition was changed in the project inspector.			*)
+
   Left := (Application.MainForm.Left + Width DIV 2 + Screen.Width DIV 2) DIV 2;
   Top := (Application.MainForm.Top + Height DIV 2 + Screen.Height DIV 2) DIV 2;
   RadioGroup1.Items.Clear;

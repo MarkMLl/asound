@@ -1,13 +1,13 @@
 object BeepDemoForm: TBeepDemoForm
-  Left = 522
+  Left = 128
   Height = 240
-  Top = 166
+  Top = 128
   Width = 320
   Caption = 'BeepDemoForm'
   ClientHeight = 240
   ClientWidth = 320
   OnCreate = FormCreate
-  LCLVersion = '2.1.0.0'
+  LCLVersion = '2.2.6.0'
   object ButtonAlsaPcmBeep: TButton
     Left = 16
     Height = 33
@@ -28,19 +28,19 @@ object BeepDemoForm: TBeepDemoForm
   end
   object Label1: TLabel
     Left = 87
-    Height = 19
+    Height = 18
     Top = 19
     Width = 41
     Caption = 'Label1'
     ParentColor = False
   end
-  object Button1X11Beep: TButton
+  object ButtonX11Beep: TButton
     Left = 164
     Height = 31
     Top = 72
     Width = 132
     Caption = 'X11 Beep'
-    OnClick = Button1X11BeepClick
+    OnClick = ButtonX11BeepClick
     TabOrder = 2
   end
   object ButtonAlsaSeqBeep: TButton

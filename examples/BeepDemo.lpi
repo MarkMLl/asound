@@ -30,7 +30,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="16">
+    <Units Count="11">
       <Unit0>
         <Filename Value="BeepDemo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -49,68 +49,42 @@
         <UnitName Value="AlsaPcmDemo"/>
       </Unit2>
       <Unit3>
-        <Filename Value="../asound_dynamic.pas"/>
+        <Filename Value="../AsoundSeqDefs.inc"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Asound_dynamic"/>
       </Unit3>
       <Unit4>
-        <Filename Value="../asoundseq_dynamic.pas"/>
+        <Filename Value="../AsoundPcmDefs.inc"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="AsoundSeq_dynamic"/>
       </Unit4>
       <Unit5>
-        <Filename Value="../AsoundSeqDefs.inc"/>
+        <Filename Value="../AsoundDefs.inc"/>
         <IsPartOfProject Value="True"/>
       </Unit5>
       <Unit6>
-        <Filename Value="../asoundseq.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="AsoundSeq"/>
-      </Unit6>
-      <Unit7>
-        <Filename Value="../asoundpcm_dynamic.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="AsoundPcm_dynamic"/>
-      </Unit7>
-      <Unit8>
-        <Filename Value="../AsoundPcmDefs.inc"/>
-        <IsPartOfProject Value="True"/>
-      </Unit8>
-      <Unit9>
-        <Filename Value="../asoundpcm.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="AsoundPcm"/>
-      </Unit9>
-      <Unit10>
-        <Filename Value="../AsoundDefs.inc"/>
-        <IsPartOfProject Value="True"/>
-      </Unit10>
-      <Unit11>
-        <Filename Value="../asound.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Asound"/>
-      </Unit11>
-      <Unit12>
         <Filename Value="alsaseqdemo.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="AlsaSeqDemo"/>
-      </Unit12>
-      <Unit13>
+      </Unit6>
+      <Unit7>
         <Filename Value="midiselectcode.pas"/>
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
         <UnitName Value="MidiSelectCode"/>
-      </Unit13>
-      <Unit14>
+      </Unit7>
+      <Unit8>
         <Filename Value="watchxyzmidi.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="WatchXyzMidi"/>
-      </Unit14>
-      <Unit15>
+      </Unit8>
+      <Unit9>
         <Filename Value="midiparse.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="MidiParse"/>
-      </Unit15>
+      </Unit9>
+      <Unit10>
+        <Filename Value="../AsoundSeq-macros.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit10>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -119,11 +93,28 @@
       <Filename Value="BeepDemo-$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
     </Target>
     <SearchPaths>
-      <IncludeFiles Value="$(ProjOutDir)"/>
+      <IncludeFiles Value="$(ProjOutDir);.."/>
       <OtherUnitFiles Value=".."/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <IncludeAssertionCode Value="True"/>
+      </SyntaxOptions>
+    </Parsing>
+    <CodeGeneration>
+      <Checks>
+        <IOChecks Value="True"/>
+        <RangeChecks Value="True"/>
+        <OverflowChecks Value="True"/>
+        <StackChecks Value="True"/>
+      </Checks>
+      <VerifyObjMethodCallValidity Value="True"/>
+    </CodeGeneration>
     <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf2Set"/>
+      </Debugging>
       <Options>
         <Win32>
           <GraphicApplication Value="True"/>

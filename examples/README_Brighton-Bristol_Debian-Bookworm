@@ -1,0 +1,100 @@
+Apropos Debian "Bookworm" (SID/Testing as of early 2023).
+
+In response to pressing the "ALSA MIDI Beep" button, a dialogue box should be
+presented containing the names of the output devices. My experience is that
+this works properly for both a USB-connected hardware MIDI device ("MD100")
+or for QSynth (a FluidSynth GUI), but not for the Brighton/Bristol synthesiser
+emulator.
+
+To get Brighton/Bristol working, execute QJackCtl: this might or might not
+start the Jack daemon automatically and might or might not have patchbay
+persistence ("not" is assumed in both cases for the remainder of this note).
+
+Press "Start" to run the Jack daemon, then run the synthesiser emulator as
+packaged by Debian:
+
+$ startBristol -pro10 -midi seq
+
+Now use QJackCtl's Graph window to make connections from the Bristol object's
+"out_left" and "out_right" ports to the system object's "playback_1" and
+"playback_2" ports.
+
+Test that the keyboard on the GUI portion of the synthesiser emulator (i.e.
+"Brighton") works properly, then that the "ALSA MIDI Beep" button has the
+expected effect.
+
+-----
+
+I don't remember having anything like this degree of difficulty getting things
+going with older Debian releases, I'm pretty sure that this is something to do
+with the introduction of Jack for PCM (if not MIDI) routing.
+
+-----
+
+TO BE DONE: Investigate the extent to which the GUI can be controlled by
+messages from a physical controller. The objective is to be able to map the
+drawbars etc. on an input-only controller to GUI controls, with an effect
+determined by which synthesiser is being emulated.
+
+This from cira 2006:
+
+"Here is the lowdown on MIDI in bristol. The GUI and the engine are separate
+processes. They speak SYSEX messages to adjust the parameters, and the
+keyboard sends NOTE events - all across a TCP socket primarily from GUI to
+engine (there are some acknowledgements). Separately the engine listens, per
+default, to the ALSA SEQ or raw MIDI interface for MIDI events. It only
+supports the following: NOTE ON/OFF, CONTINUOUS 0 and 1 for pitch and mod
+wheels, and the memory moog should respond to controllers 7 and 11 for two
+foot pedals - expression and volume.
+
+"I was not sure whether to implement the sustain pedal. Most master keyboards
+will use this to control sending note off events for sustain, so bristol
+then does not have too.
+
+"Now when it comes to controlling parameters, this is a GUI function. The GUI
+will have to register to receive MIDI events as well as the engine, change
+its potentiometer settings and then tell the engine to adjust its
+operational parameters. Also for program change events it is the GUI that
+has memories, not the engine. In my opinion this is the correct approach,
+but it introduces a couple of issues regarding controller manipulation.
+Either way controls will be implemented and I will maintain an option for
+tracking the keyboard in the GUI for the reasons you state."
+
+https://linux-audio-user.linuxaudio.narkive.com/UeWsCBGs/ann-bristol-0-9-5-60
+
+Also the discussion at https://sourceforge.net/p/bristol/discussion/529491/thread/10fac094/
+
+As of 2023 I think the brightonControllers.c file is relevant, noting that it
+appears to describe control messages parsed from stdin rather than from the
+MIDI input.
+
+If I connect a MIDI keyboard via USB and check the ALSA (as distinct from Jack)
+sequencer (i.e. MIDI) devices:
+
+$ aconnect -l
+...
+client 24: 'Keystation Pro 88' [type=kernel,card=2]
+    0 'Keystation Pro 88 MIDI 1'
+    1 'Keystation Pro 88 MIDI 2'
+...
+    client 130: 'bristol' [type=user,pid=528714]
+    0 'bristol input   '
+
+Then set up connections using
+
+$ aconnect 24:0 130:0
+$ aconnect 24:1 130:0
+
+I can confirm that the notes, pitchbend and modulation from the keyboard
+appear to have useful effect, although there is no feedback from the GUI.
+
+I don't think that, realistically, I'm going to get any further forward with
+Brighton/Bristol here: at least without doing a substantial amount of work on
+their sourcecode myself.
+
+Subject to setting up the connection explicitly using aconnect, I can confirm
+that a keyboard can send program (i.e. instrument) changes to an attached MIDI
+sound generator. Many controller-only keyboards (i.e. without an internal sound
+generator etc.) also have programmable buttons (as well as dials, drawbars and
+so on), which mat either be programmable or could potentially be converted to
+suitable commands for an attached sound generator using an interposed program.

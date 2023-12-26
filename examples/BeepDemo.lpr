@@ -1,3 +1,5 @@
+(* Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FP *)
+
 program BeepDemo;
 
 {$mode objfpc}{$H+}
@@ -11,7 +13,7 @@ uses
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, BeepDemoCode, AlsaPcmDemo, AlsaSeqDemo, MidiSelectCode, WatchXyzMidi,
-  MidiParse // DO NOT import Asound, Asound_dynamic etc. here
+  MidiParse // DO NOT import paired Asound, Asound_dynamic etc. here
   { you can add units after this };
 
 {$R *.res}

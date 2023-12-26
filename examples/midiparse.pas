@@ -1,4 +1,4 @@
-(* Lazarus+FPC 2.0.0+3.0.4 on Linux Lazarus+FPC 2.0.0+3.0.4 on Linux Lazarus+FP *)
+(* Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FP *)
 
 unit MidiParse;
 
@@ -18,7 +18,7 @@ unit MidiParse;
 // c00e !127 +250 C6 A5FD !112 B !80 GE +500 C
 //
 // In the cases above, c0xx selects an instrument, ! prefixes a velocity (i.e.
-// volume) expressed as two hex digits, and + prefixes a duration expressed as
+// volume) expressed as decimal digits, and + prefixes a duration expressed as
 // mSec. Notes are capitalised and may have a trailing # (sharp) and/or octave
 // number (C5 is middle C), _ is a rest.
 //
@@ -30,16 +30,8 @@ unit MidiParse;
 
 interface
 
-{$define DYNAMIC }
-
 uses
-  Classes, SysUtils, AlsaSeqDemo,
-{$ifdef DYNAMIC }
-                        AsoundSeq_dynamic
-{$else          }
-                        AsoundSeq
-{$endif DYNAMIC }
-;
+  Classes, SysUtils, AlsaSeqDemo, WatchXyzMidi;
 
 (* Parse a note, hint, or raw MIDI command expressed as hex from the front of
   the string and delete it. Emit an ALSA-format event set to SND_SEQ_EVENT_NONE
@@ -48,18 +40,17 @@ uses
 
   MIGHT handle sysex messages of up to three bytes, but DEFINITELY NOT longer.
 *)
-function ParseMidiToEvent(var txt: string; var ev: snd_seq_event_t): boolean;
+function ParseMidiToEvent(var txt: string; var ev: snd_seq_event_t_): boolean;
 
 (* Initialise the parser. This is not mandatory but makes sure that persistent
-  octave etc. are reset to the default values. As a side-effect, return true if
-  the MIDI library is linked dynamically so that all units can check consistency.
+  octave etc. are reset to the default values.
 *)
-function InitMidiParser(): boolean;
+procedure InitMidiParser;
 
 
 implementation
 
-uses StrUtils;
+uses StrUtils, UnixType;
 
 var
   lastExplicitDuration: integer= 500;
@@ -74,7 +65,7 @@ var
 
   MIGHT handle sysex messages of up to three bytes, but DEFINITELY NOT longer.
 *)
-function ParseMidiToEvent(var txt: string; var ev: snd_seq_event_t): boolean;
+function ParseMidiToEvent(var txt: string; var ev: snd_seq_event_t_): boolean;
 
 
   (* Parse up to six hex digits, and convert them into an event with reference to
@@ -102,14 +93,14 @@ function ParseMidiToEvent(var txt: string; var ev: snd_seq_event_t): boolean;
 (* decoding the data since some of it is common to multiple types.              *)
 
     case hexInt shr 20 of
-      $8: ev.type_ := byte(SND_SEQ_EVENT_NOTEOFF);
-      $9: ev.type_ := byte(SND_SEQ_EVENT_NOTEON);
-      $a: ev.type_ := byte(SND_SEQ_EVENT_KEYPRESS);
-      $b: ev.type_ := byte(SND_SEQ_EVENT_CONTROLLER);
-      $c: ev.type_ := byte(SND_SEQ_EVENT_PGMCHANGE);
-      $d: ev.type_ := byte(SND_SEQ_EVENT_CHANPRESS);
-      $e: ev.type_ := byte(SND_SEQ_EVENT_PITCHBEND);
-      $f: ev.type_ := byte(SND_SEQ_EVENT_SYSEX)
+      $8: ev.type_ := byte(SND_SEQ_EVENT_NOTEOFF_);
+      $9: ev.type_ := byte(SND_SEQ_EVENT_NOTEON_);
+      $a: ev.type_ := byte(SND_SEQ_EVENT_KEYPRESS_);
+      $b: ev.type_ := byte(SND_SEQ_EVENT_CONTROLLER_);
+      $c: ev.type_ := byte(SND_SEQ_EVENT_PGMCHANGE_);
+      $d: ev.type_ := byte(SND_SEQ_EVENT_CHANPRESS_);
+      $e: ev.type_ := byte(SND_SEQ_EVENT_PITCHBEND_);
+      $f: ev.type_ := byte(SND_SEQ_EVENT_SYSEX_)
     otherwise
       exit(false)
     end;
@@ -119,24 +110,24 @@ function ParseMidiToEvent(var txt: string; var ev: snd_seq_event_t): boolean;
 (* to be sent to the physical synthesiser.                                      *)
 
     case ev.type_ of
-      byte(SND_SEQ_EVENT_NOTEOFF),
-      byte(SND_SEQ_EVENT_NOTEON),
-      byte(SND_SEQ_EVENT_KEYPRESS):   begin
+      byte(SND_SEQ_EVENT_NOTEOFF_),
+      byte(SND_SEQ_EVENT_NOTEON_),
+      byte(SND_SEQ_EVENT_KEYPRESS_):   begin
                                         ev.data.note.channel := (hexInt shr 16) and $0f;
                                         ev.data.note.note := (hexInt shr 8) and $7f;
                                         ev.data.note.velocity := hexInt and $7f
                                       end;
-      byte(SND_SEQ_EVENT_CONTROLLER): begin
+      byte(SND_SEQ_EVENT_CONTROLLER_): begin
                                         ev.data.control.channel := (hexInt shr 16) and $0f;
                                         ev.data.control.param := (hexInt shr 8) and $7f;
                                         ev.data.control.value := hexInt and $7f
                                       end;
-      byte(SND_SEQ_EVENT_PGMCHANGE),
-      byte(SND_SEQ_EVENT_CHANPRESS):  begin
+      byte(SND_SEQ_EVENT_PGMCHANGE_),
+      byte(SND_SEQ_EVENT_CHANPRESS_):  begin
                                         ev.data.control.channel := (hexInt shr 16) and $0f;
                                         ev.data.control.value := (hexInt shr 8) and $7f
                                       end;
-      byte(SND_SEQ_EVENT_PITCHBEND):  begin
+      byte(SND_SEQ_EVENT_PITCHBEND_):  begin
                                         ev.data.control.channel := (hexInt shr 16) and $0f;
                                         ev.data.control.value := ((hexInt shr 8) and $7f +
                                                         (hexInt and $7f) shl 7) - $2000
@@ -145,7 +136,7 @@ function ParseMidiToEvent(var txt: string; var ev: snd_seq_event_t): boolean;
 (* Sysex messages are not currently supported since they are usually longer     *)
 (* than the three bytes being decoded here.                                     *)
 // TODO : MIDI sysex messages
-      byte(SND_SEQ_EVENT_SYSEX):      begin
+      byte(SND_SEQ_EVENT_SYSEX_):      begin
                                         exit(false)
                                       end
     otherwise
@@ -183,7 +174,7 @@ function ParseMidiToEvent(var txt: string; var ev: snd_seq_event_t): boolean;
       end;
       Delete(txt, 1, 1)
     end;
-    ev.type_ := byte(SND_SEQ_EVENT_NOTE);
+    ev.type_ := byte(SND_SEQ_EVENT_NOTE_);
     ev.data.note.channel := 0;
     if noteCode >=  0 then begin
       ev.data.note.note := noteCode + (12 * lastExplicitOctave) + isSharp;
@@ -213,8 +204,8 @@ function ParseMidiToEvent(var txt: string; var ev: snd_seq_event_t): boolean;
       decStr += txt[1];
       Delete(txt, 1, 1)
     end;
-    lastExplicitDuration := StrToInt(decStr);
-    ev.type_ := byte(SND_SEQ_EVENT_NONE);       (* Do not generate MIDI output  *)
+    lastExplicitDuration := StrToIntDef(decStr, 0);
+    ev.type_ := byte(SND_SEQ_EVENT_NONE_);      (* Do not generate MIDI output  *)
     result := true
   end { parseDuration } ;
 
@@ -234,8 +225,8 @@ function ParseMidiToEvent(var txt: string; var ev: snd_seq_event_t): boolean;
       decStr += txt[1];
       Delete(txt, 1, 1)
     end;
-    lastExplicitVelocity := StrToInt(decStr) mod 128;
-    ev.type_ := byte(SND_SEQ_EVENT_NONE);       (* Do not generate MIDI output  *)
+    lastExplicitVelocity := StrToIntDef(decStr, 0) mod 128;
+    ev.type_ := byte(SND_SEQ_EVENT_NONE_);      (* Do not generate MIDI output  *)
     result := true
   end { parseVelocity } ;
 
@@ -257,20 +248,16 @@ end { ParseMidiToEvent } ;
 
 
 (* Initialise the parser. This is not mandatory but makes sure that persistent
-  octave etc. are reset to the default values. As a side-effect, return true if
-  the MIDI library is linked dynamically so that all units can check consistency.
+  octave etc. are reset to the default values.
 *)
-function InitMidiParser(): boolean;
+procedure InitMidiParser;
 
 begin
-  result := AsoundSeq.IsDynamic;
   lastExplicitDuration := 500;
   lastExplicitOctave := 5;
   lastExplicitVelocity := 64
 end { InitMidiParser } ;
 
 
-initialization
-  Assert(AsoundSeq.IsDynamic() = AlsaSeqDemo.IsDynamic(), 'Internal error: mixing static and dynamic ALSA linkage')
 end.
 

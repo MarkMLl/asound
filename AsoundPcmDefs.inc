@@ -1,4 +1,19 @@
 
+(********************************************************************************)
+(********************************************************************************)
+(**                                                                            **)
+(** FORMATTING NOTE: This file might be post-processed to generate Pascal      **)
+(** units describing the static and dynamic interfaces to an external library. **)
+(** Subroutine declarations MUST start with case-insensitive "function" or     **)
+(** "procedure" as appropriate, and MUST end either with a Pascal macro name   **)
+(** with at least one trailing underscore or with a semicolon. The style of    **)
+(** termination is used to distinguish between external entry points and local **)
+(** routines implemented as functional equivalents to C-style macros           **)
+(** respectively.                                                              **)
+(**                                                                            **)
+(********************************************************************************)
+(********************************************************************************)
+
 (* This file contains the list of procedures/functions, either exported by a    *)
 (* shared library or implemented by a statically-linked library. This might     *)
 (* also double as the description of a list of procedures/functions exported by *)
@@ -31,10 +46,16 @@
 
 // Documentation from https://www.alsa-project.org/alsa-doc/alsa-lib/group___p_c_m.html
 
+{
+#include <UnixType>
+}
+
 {$ifdef CONSTS }
 {$endif CONSTS }
 
 {$ifdef TYPES  }
+
+// fpalsa defines these in pcm.inc:
 
 type
   { Signed frames quantity }
@@ -70,7 +91,7 @@ const
 
 {$ifdef PROCS  }
 
-// fpalsa defines these in seq.inc:
+// fpalsa defines these in pcm.inc:
 
 
 (* Opens a PCM.
@@ -177,6 +198,20 @@ Returns
 Closes the specified PCM handle and frees all associated resources.
 *)
 function snd_pcm_close(pcm: Psnd_pcm_t): cint; cdecl; LIBASOUND__
+
+
+// fpalsa defines these in error.inc:
+
+
+(* Returns the message for an error code.
+
+Parameters
+    errnum	The error code number, which must be a system error code or an ALSA error code.
+
+Returns
+    The ASCII description of the given numeric error code.
+*)
+function snd_strerror(errnum: cint): PChar; cdecl; LIBASOUND__
 
 {$endif PROCS  }
 

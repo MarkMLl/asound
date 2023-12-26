@@ -1,3 +1,5 @@
+(* Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FP *)
+
 unit AlsaPcmDemo;
 
 (* Demo beep for Linux using ALSA, with a simple signal-generation function     *)
@@ -19,13 +21,12 @@ function BeepPcm(freqHz: integer= 880; mSec: integer= 660): boolean;
 
 (* Is the underlying ALSA library linked statically or dynamically?
 *)
-
 function IsDynamic(): boolean;
 
 
 implementation
 
-{$define DYNAMIC }
+{$define DYNAMIC }                      (* Change as required                   *)
 
 uses
 {$ifdef LCL }
@@ -34,7 +35,6 @@ uses
 {$ifdef DYNAMIC }
   AsoundPcm_dynamic;                    (* AsoundPcm (hence Asound) is an object *)
 {$else }
-uses
   AsoundPcm;                            (* AsoundPcm (hence Asound) is a unit   *)
 {$endif DYNAMIC }
 
@@ -139,7 +139,6 @@ end { BeepPcm } ;
 
 (* Is the underlying ALSA library linked statically or dynamically?
 *)
-
 function IsDynamic(): boolean;
 
 begin

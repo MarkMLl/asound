@@ -1,3 +1,5 @@
+(* Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FP *)
+
 unit BeepDemoCode;
 
 (* Demo GUI beep for Linux using ALSA.                          MarkMLl         *)
@@ -15,11 +17,11 @@ type
 
   TBeepDemoForm = class(TForm)
     ButtonAlsaSeqBeep: TButton;
-    Button1X11Beep: TButton;
+    ButtonX11Beep: TButton;
     ButtonStdoutBeep: TButton;
     ButtonAlsaPcmBeep: TButton;
     Label1: TLabel;
-    procedure Button1X11BeepClick(Sender: TObject);
+    procedure ButtonX11BeepClick(Sender: TObject);
     procedure ButtonAlsaPcmBeepClick(Sender: TObject);
     procedure ButtonAlsaSeqBeepClick(Sender: TObject);
     procedure ButtonStdoutBeepClick(Sender: TObject);
@@ -73,6 +75,9 @@ begin
   BeepPcm(880, 660)
 end;
 
+
+(* Play a MIDI sequence representing a beep.
+*)
 procedure TBeepDemoForm.ButtonAlsaSeqBeepClick(Sender: TObject);
 
 begin
@@ -80,7 +85,7 @@ begin
 end;
 
 
-procedure TBeepDemoForm.Button1X11BeepClick(Sender: TObject);
+procedure TBeepDemoForm.ButtonX11BeepClick(Sender: TObject);
 
 begin
   bellX11
