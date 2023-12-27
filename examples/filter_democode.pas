@@ -1,3 +1,5 @@
+(* Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FPC 2.2.6+3.2.2 on Linux Lazarus+FP *)
+
 unit Filter_DemoCode;
 
 {$mode ObjFPC}{$H+}

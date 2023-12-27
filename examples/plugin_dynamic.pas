@@ -20,7 +20,7 @@ uses
   Classes, SysUtils, AsoundSeq, DynamicModule;
 
 const
-  DefaultModuleName= 'filter_demo.so';
+  DefaultModuleName= 'libfilter_demo.so';
   DefaultEarlyLoad= true;
   HasLoadVarargsRoutine= true;          (* Presence is implementation-defined   *)
 
@@ -77,7 +77,7 @@ type
   end;
 
 (* Return either a static or a dynamic representation of the Filter_demo embedding
-  library (filter_demo.so or similar). In this case it is dynamic.
+  library (libfilter_demo.so or similar). In this case it is dynamic.
 *)
 function plugin(): Tplugin; inline;
 
@@ -178,7 +178,7 @@ end { Tplugin.ApplyFilter } ;
 
 
 (* Return either a static or a dynamic representation of the Filter_demo embedding
-  library (filter_demo.so or similar). In this case it is dynamic.
+  library (libfilter_demo.so or similar). In this case it is dynamic.
 *)
 function plugin(): Tplugin; inline;
 

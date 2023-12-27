@@ -12,17 +12,17 @@
           <Mode Name="Default"/>
         </BuildModes>
       </Target>
-      <Target FileName="MidiFilter.lpi">
-        <BuildModes>
-          <Mode Name="Default"/>
-        </BuildModes>
-      </Target>
       <Target FileName="PluginSharedMakefile.lpi">
         <BuildModes>
           <Mode Name="Default"/>
         </BuildModes>
       </Target>
       <Target FileName="Filter_Demo.lpi">
+        <BuildModes>
+          <Mode Name="Default"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="MidiFilter.lpi">
         <BuildModes>
           <Mode Name="Default"/>
         </BuildModes>

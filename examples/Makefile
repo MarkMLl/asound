@@ -5,7 +5,7 @@
 all: plugin Makefile
 
 plugin: plugin.inc Makefile
-	defToSDUnits plugin.inc filter_demo
+	defToSDUnits plugin.inc libfilter_demo
 	mv plugin.static plugin.pas
 	mv plugin.dynamic plugin_dynamic.pas
 	echo ''

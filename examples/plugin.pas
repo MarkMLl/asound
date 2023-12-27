@@ -1,6 +1,6 @@
 // unit THIS LINE NEEDED FOR DECLARATION HINTING TO WORK
 (* Return either a static or a dynamic representation of the Filter_demo embedding
-  library (filter_demo.a or similar). In this case it is static.
+  library (libfilter_demo.a or similar). In this case it is static.
 *)
 unit plugin;
 
@@ -24,7 +24,7 @@ uses
   Classes, SysUtils, AsoundSeq;
 
 const
-  DefaultModuleName= 'filter_demo';
+  DefaultModuleName= 'libfilter_demo';
   DefaultEarlyLoad= true;
   HasLoadVarargsRoutine= true;          (* Presence is implementation-defined   *)
 
@@ -58,7 +58,7 @@ const
 {$define VPROCS }
 {$define CDECL__:= cdecl; }
 {$define CDECL_VARARGS__:= cdecl varargs; }
-{$define PLUGIN__:= external 'filter_demo'; }
+{$define PLUGIN__:= external 'libfilter_demo'; }
 {$i plugin.inc }
 {$pop }
 

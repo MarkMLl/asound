@@ -52,6 +52,12 @@
         <ExecutableType Value="Library"/>
       </Options>
     </Linking>
+    <Other>
+      <ExecuteAfter>
+        <Command Value="mv libfilter_demo.so filter_demo.so"/>
+        <CompileReasons Run="False"/>
+      </ExecuteAfter>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions>
