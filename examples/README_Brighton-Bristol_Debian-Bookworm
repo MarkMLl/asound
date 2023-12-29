@@ -1,14 +1,16 @@
 Apropos Debian "Bookworm" (SID/Testing as of early 2023).
 
-In response to pressing the "ALSA MIDI Beep" button, a dialogue box should be
-presented containing the names of the output devices. My experience is that
-this works properly for both a USB-connected hardware MIDI device ("MD100")
-or for QSynth (a FluidSynth GUI), but not for the Brighton/Bristol synthesiser
-emulator.
+In response to pressing BeepDemo's "ALSA MIDI Beep" button, a dialogue box
+should be presented containing the names of the output devices. My experience
+is that this works properly for both a USB-connected hardware MIDI device
+("MD100") or for QSynth (a FluidSynth GUI), but not for the Brighton/Bristol
+synthesiser emulator.
 
 To get Brighton/Bristol working, execute QJackCtl: this might or might not
 start the Jack daemon automatically and might or might not have patchbay
 persistence ("not" is assumed in both cases for the remainder of this note).
+
+Check that Settings -> Parameters -> Interface refers to a real PCM device.
 
 Press "Start" to run the Jack daemon, then run the synthesiser emulator as
 packaged by Debian:
@@ -23,6 +25,10 @@ Test that the keyboard on the GUI portion of the synthesiser emulator (i.e.
 "Brighton") works properly, then that the "ALSA MIDI Beep" button has the
 expected effect.
 
+Connect from the Keystation's "MIDI 1" to "bristol input", note that the
+Graph window does not show an explicit connection between the ALSA "bristol"
+device and the Jack "bristol" synthesiser device.
+
 -----
 
 I don't remember having anything like this degree of difficulty getting things
@@ -30,6 +36,33 @@ going with older Debian releases, I'm pretty sure that this is something to do
 with the introduction of Jack for PCM (if not MIDI) routing.
 
 -----
+
+Alternatively, If I connect a MIDI keyboard via USB and check the ALSA (as
+distinct from Jack) sequencer (i.e. MIDI) devices:
+
+$ aconnect -l
+...
+client 24: 'Keystation Pro 88' [type=kernel,card=2]
+    0 'Keystation Pro 88 MIDI 1'
+    1 'Keystation Pro 88 MIDI 2'
+...
+    client 130: 'bristol' [type=user,pid=528714]
+    0 'bristol input   '
+
+Then set up connections using
+
+$ aconnect 24:0 130:0
+$ aconnect 24:1 130:0
+
+I can confirm that the notes, pitchbend and modulation from the keyboard
+appear to have useful effect, although there is no feedback from the GUI.
+
+-----
+
+
+
+
+
 
 TO BE DONE: Investigate the extent to which the GUI can be controlled by
 messages from a physical controller. The objective is to be able to map the
@@ -68,6 +101,9 @@ As of 2023 I think the brightonControllers.c file is relevant, noting that it
 appears to describe control messages parsed from stdin rather than from the
 MIDI input.
 
+
+
+
 If I connect a MIDI keyboard via USB and check the ALSA (as distinct from Jack)
 sequencer (i.e. MIDI) devices:
 
@@ -88,13 +124,68 @@ $ aconnect 24:1 130:0
 I can confirm that the notes, pitchbend and modulation from the keyboard
 appear to have useful effect, although there is no feedback from the GUI.
 
-I don't think that, realistically, I'm going to get any further forward with
-Brighton/Bristol here: at least without doing a substantial amount of work on
-their sourcecode myself.
+-----
+        7. Controlling the GUI from a MIDI master controller
 
-Subject to setting up the connection explicitly using aconnect, I can confirm
-that a keyboard can send program (i.e. instrument) changes to an attached MIDI
-sound generator. Many controller-only keyboards (i.e. without an internal sound
-generator etc.) also have programmable buttons (as well as dials, drawbars and
-so on), which mat either be programmable or could potentially be converted to
-suitable commands for an attached sound generator using an interposed program.
+It is possible to get the GUI to be controlled from faders on a master 
+controller. First connect up the MIDI as described above. Place the mouse
+cursor over the GUI control you want to track and push the Middle Mouse Button.
+Now move the MIDI control, the GUI should now track that control. Devices can
+be unregistered using the same method. The settings will be saved when you
+save a memory.
+
+The settings themselves are in the directory listed below, and they can be
+edited with a text editor.
+
+    /home/username/.bristol/memory/profiles/<synthname> 
+
+Most of the synths come with a standard GM midi mapping for controlling filter
+cutoff/resonance, etc.
+-----
+
+https://wiki.cdot.senecacollege.ca/wiki/Correspondence_with_Nick_Copeland
+
+In particular, on the HammondB3 "The controller settings are saved when you save
+a memory, you should be able to double click on the lower manual highest reverse
+key 'B'. The reversed keys are memories, you can select them quickly here and
+this B key can save changes if you want to keep them."
+
+This appears to result in two files:
+
+~/.bristol/memory/profiles/hammondB3
+~/.bristol/memor/yhammondB3/hammondB323.mem
+
+As an example, if the Hammond B3 emulation is to have its sliders controlled
+by the Keystation's physical sliders expect to see something like
+
+CC: 5      0/6 16384
+CC: 5      0/15 16384
+CC: 7      0/8 16384
+CC: 7      0/17 16384
+CC: 71     0/5 16384
+CC: 71     0/14 16384
+CC: 72     0/1 16384
+CC: 72     0/10 16384
+CC: 73     0/0 16384
+CC: 73     0/9 16384
+CC: 74     0/4 16384
+CC: 74     0/13 16384
+CC: 84     0/7 16384
+CC: 84     0/16 16384
+CC: 91     0/2 16384
+CC: 91     0/11 16384
+CC: 93     0/3 16384
+CC: 93     0/12 16384
+CC: 95     0/26 16384
+CC: 101    0/27 16384
+
+-----
+
+At a lower level, I believe that the GUI rendition of instruments puts
+controller changes (etc.) into messages possibly starting SLAB, and sends
+those to the backend "engine" as SYSEXes via a dynamically-allocated TCP port.
+
+Experience from playing with the Hammond emulation as described above suggests
+that a considerable amount of research will be needed in order to get the GUI
+code for each emulated control.
+
