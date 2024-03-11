@@ -16,15 +16,31 @@ type
   { TBeepDemoForm }
 
   TBeepDemoForm = class(TForm)
-    ButtonAlsaSeqBeep: TButton;
-    ButtonX11Beep: TButton;
+    ButtonStdoutIoctlBeep: TButton;
+    ButtonDevTtyIoctlBeep: TButton;
+    ButtonStdoutIoctlBell: TButton;
+    ButtonDefaultBeep: TButton;
     ButtonStdoutBeep: TButton;
-    ButtonAlsaPcmBeep: TButton;
+    ButtonDevTtyBeep: TButton;
+    ButtonDevTtyIoctlBell: TButton;
+    ButtonDevTtyBell: TButton;
+    ButtonAlsaSeqNote: TButton;
+    ButtonX11Bell: TButton;
+    ButtonStdoutBell: TButton;
+    ButtonAlsaPcmTone: TButton;
     Label1: TLabel;
-    procedure ButtonX11BeepClick(Sender: TObject);
-    procedure ButtonAlsaPcmBeepClick(Sender: TObject);
-    procedure ButtonAlsaSeqBeepClick(Sender: TObject);
+    procedure ButtonDefaultBeepClick(Sender: TObject);
+    procedure ButtonDevTtyBeepClick(Sender: TObject);
+    procedure ButtonDevTtyIoctlBeepClick(Sender: TObject);
+    procedure ButtonDevTtyIoctlBellClick(Sender: TObject);
     procedure ButtonStdoutBeepClick(Sender: TObject);
+    procedure ButtonStdoutIoctlBeepClick(Sender: TObject);
+    procedure ButtonStdoutIoctlBellClick(Sender: TObject);
+    procedure ButtonX11BellClick(Sender: TObject);
+    procedure ButtonAlsaPcmToneClick(Sender: TObject);
+    procedure ButtonAlsaSeqNoteClick(Sender: TObject);
+    procedure ButtonDevTtyBellClick(Sender: TObject);
+    procedure ButtonStdoutBellClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   strict private
   public
@@ -39,14 +55,12 @@ implementation
 {$R *.lfm}
 
 uses
-  AlsaPcmDemo, AlsaSeqDemo, TermIO, xkblib, xlib;
-
-{ TBeepDemoForm }
+  AlsaPcmDemo, AlsaSeqDemo, TermIO, xkblib, xlib, BaseUnix, Linux, Errors;
 
 
 (* Whether this works is system-specific.
 *)
-procedure bellX11(strokes: integer= 1);
+procedure doBellX11(strokes: integer= 1);
 
 var
   dpy: PDisplay;
@@ -63,13 +77,13 @@ begin
     finally
       XCloseDisplay(dpy)
     end
-end { bellX11 } ;
+end { doBellX11 } ;
 
 
 (* Beep under DOS on an IBM PS/2-77 is 900Hz 660mS but I've "rounded" this here
   to a standard note (octave above standard A).
 *)
-procedure TBeepDemoForm.ButtonAlsaPcmBeepClick(Sender: TObject);
+procedure TBeepDemoForm.ButtonAlsaPcmToneClick(Sender: TObject);
 
 begin
   BeepPcm(880, 660)
@@ -78,24 +92,201 @@ end;
 
 (* Play a MIDI sequence representing a beep.
 *)
-procedure TBeepDemoForm.ButtonAlsaSeqBeepClick(Sender: TObject);
+procedure TBeepDemoForm.ButtonAlsaSeqNoteClick(Sender: TObject);
 
 begin
   BeepSeq
 end;
 
 
-procedure TBeepDemoForm.ButtonX11BeepClick(Sender: TObject);
+procedure TBeepDemoForm.ButtonX11BellClick(Sender: TObject);
 
 begin
-  bellX11
+  doBellX11
+end;
+
+
+procedure doDevTtyBeep;
+
+var
+  devTty: Text;
+
+begin
+  AssignFile(devTty, '/dev/tty');
+  Rewrite(devTty);
+  Write(devTty, #$07);
+  CloseFile(devTty)
+end;
+
+
+procedure doDevTtyIoctlBeep;
+
+var
+  res: cint;
+
+const
+  tone: word= Round(1190000 / 880);
+  duration: word= 660;
+
+var
+  devTty: Text;
+
+begin
+  AssignFile(devTty, '/dev/tty');
+  Rewrite(devTty);
+//  res := fpIoctl(TextRec(devTty).Handle, KDMKTONE, pointer((duration << 16) + tone));
+  res := fpIoctl(TextRec(devTty).Handle, KDMKTONE, pointer((tone << 16) + duration));
+
+// Not sure of the correct order above, but in any event it requires a "typewriter".
+
+  if res < 0 then begin
+    res := errno;                       (* Visible to debugger                  *)
+    WriteLn('Error ', res, ': ', StrError(res));
+    Flush(Output)
+  end;
+  CloseFile(devTty)
+end;
+
+
+procedure doStdoutBeep;
+
+begin
+  Write(#$07)
+end;
+
+
+(* Beep under DOS on an IBM PS/2-77 is 900Hz 660mS but I've "rounded" this here
+  to a standard note (octave above standard A).
+*)
+procedure doStdoutIoctlBeep;
+
+const
+  tone: word= Round(1190000 / 880);
+  duration: word= 660;
+
+var
+  res: cint;
+
+begin
+//  res := fpIoctl(1 { TextRec(Output).Handle } , KDMKTONE, pointer((duration << 16) + tone))
+  res := fpIoctl(1 { TextRec(Output).Handle } , KDMKTONE, pointer((tone << 16) + duration));
+
+// Not sure of the correct order above, but in any event it requires a "typewriter".
+
+  if res < 0 then begin
+    res := errno;                       (* Visible to debugger                  *)
+    WriteLn('Error ', res, ': ', StrError(res));
+    Flush(Output)
+  end
+end;
+
+
+(* Like the standard InterlockedExchange() functions, the read and write of the
+  target parameter is indivisble but not that of the source parameter which has
+  to be updated from the result.
+*)
+function InterlockedExchangeBH(var target: TBeepHandler; const source: TBeepHandler): TBeepHandler; inline;
+
+begin
+{$if sizeof(TBeepHandler) = 8 }
+  result := TBeepHandler(InterlockedExchange64(PtrUInt(target), PtrUInt(source)))
+{$else                        }
+  result := TBeepHandler(InterlockedExchange(PtrUInt(target), PtrUInt(source)))
+{$endif                       }
+end;
+
+
+{ TBeepDemoForm }
+
+
+procedure TBeepDemoForm.ButtonDevTtyIoctlBellClick(Sender: TObject);
+
+begin
+  doDevTtyIoctlBeep
 end;
 
 
 procedure TBeepDemoForm.ButtonStdoutBeepClick(Sender: TObject);
 
+var
+  savedBeep: TBeepHandler = @doStdoutBeep;
+
 begin
-  Write(#$07)
+  savedBeep := InterlockedExchangeBH(OnBeep, savedBeep);
+  Application.ProcessMessages;
+  Beep();
+  Application.ProcessMessages;
+  InterlockedExchangeBH(OnBeep, savedBeep)
+end;
+
+
+procedure TBeepDemoForm.ButtonStdoutIoctlBeepClick(Sender: TObject);
+
+var
+  savedBeep: TBeepHandler= @doStdoutIoctlBeep;
+
+begin
+  savedBeep := InterlockedExchangeBH(OnBeep, savedBeep);
+  Application.ProcessMessages;
+  Beep();
+  Application.ProcessMessages;
+  InterlockedExchangeBH(OnBeep, savedBeep)
+end;
+
+
+procedure TBeepDemoForm.ButtonStdoutIoctlBellClick(Sender: TObject);
+
+begin
+  doStdoutIoctlBeep
+end;
+
+
+procedure TBeepDemoForm.ButtonDefaultBeepClick(Sender: TObject);
+
+begin
+  Beep()
+end;
+
+
+procedure TBeepDemoForm.ButtonDevTtyBeepClick(Sender: TObject);
+
+var
+  savedBeep: TBeepHandler= @doDevTtyBeep;
+
+begin
+  savedBeep := InterlockedExchangeBH(OnBeep, savedBeep);
+  Application.ProcessMessages;
+  Beep();
+  Application.ProcessMessages;
+  InterlockedExchangeBH(OnBeep, savedBeep)
+end;
+
+
+procedure TBeepDemoForm.ButtonDevTtyIoctlBeepClick(Sender: TObject);
+
+var
+  savedBeep: TBeepHandler= @doDevTtyIoctlBeep;
+
+begin
+  savedBeep := InterlockedExchangeBH(OnBeep, savedBeep);
+  Application.ProcessMessages;
+  Beep();
+  Application.ProcessMessages;
+  InterlockedExchangeBH(OnBeep, savedBeep)
+end;
+
+
+procedure TBeepDemoForm.ButtonDevTtyBellClick(Sender: TObject);
+
+begin
+  doDevTtyBeep
+end;
+
+
+procedure TBeepDemoForm.ButtonStdoutBellClick(Sender: TObject);
+
+begin
+  doStdoutBeep
 end;
 
 
@@ -111,7 +302,8 @@ begin
   Label1.Caption := 'StdOut: ' + IntToStr(TextRec(Output).Handle);
 
 // In practice this is only good enough to detect whether the handle is an
-// alias of /dev/null (ft would be zero).
+// alias of /dev/null (ft would be zero). It is not good enough to determine
+// whether it is a "typewriter": if not then the KDMKTONE ioctl() will fail.
 
 // 0 if invoked from Dolphin, 1 from shell in Konsole, 1 from IDE,
 // 0 IDE without debugging.
@@ -128,7 +320,5 @@ begin
 end;
 
 
-begin
-  Assert(AlsaPcmDemo.IsDynamic() = AlsaSeqDemo.IsDynamic(), 'Internal error: mixing static and dynamic ALSA linkage')
 end.
 

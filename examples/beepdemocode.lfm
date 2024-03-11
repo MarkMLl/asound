@@ -1,55 +1,127 @@
 object BeepDemoForm: TBeepDemoForm
   Left = 128
-  Height = 240
+  Height = 455
   Top = 128
-  Width = 320
+  Width = 314
   Caption = 'BeepDemoForm'
-  ClientHeight = 240
-  ClientWidth = 320
+  ClientHeight = 455
+  ClientWidth = 314
   OnCreate = FormCreate
   LCLVersion = '2.2.6.0'
-  object ButtonAlsaPcmBeep: TButton
-    Left = 16
-    Height = 33
-    Top = 160
-    Width = 132
-    Caption = 'ALSA PCM Beep'
-    OnClick = ButtonAlsaPcmBeepClick
-    TabOrder = 0
-  end
-  object ButtonStdoutBeep: TButton
+  object ButtonAlsaPcmTone: TButton
     Left = 16
     Height = 31
-    Top = 72
+    Top = 384
     Width = 132
-    Caption = 'Stdout Beep'
-    OnClick = ButtonStdoutBeepClick
+    Caption = 'ALSA PCM Tone'
+    OnClick = ButtonAlsaPcmToneClick
+    TabOrder = 0
+  end
+  object ButtonStdoutBell: TButton
+    Left = 16
+    Height = 33
+    Top = 128
+    Width = 132
+    Caption = 'Stdout Bell'
+    OnClick = ButtonStdoutBellClick
     TabOrder = 1
   end
   object Label1: TLabel
     Left = 87
-    Height = 18
+    Height = 19
     Top = 19
     Width = 41
     Caption = 'Label1'
     ParentColor = False
   end
-  object ButtonX11Beep: TButton
-    Left = 164
-    Height = 31
-    Top = 72
+  object ButtonX11Bell: TButton
+    Left = 16
+    Height = 33
+    Top = 64
     Width = 132
-    Caption = 'X11 Beep'
-    OnClick = ButtonX11BeepClick
+    Caption = 'X11 Bell'
+    OnClick = ButtonX11BellClick
     TabOrder = 2
   end
-  object ButtonAlsaSeqBeep: TButton
+  object ButtonAlsaSeqNote: TButton
+    Left = 164
+    Height = 31
+    Top = 384
+    Width = 132
+    Caption = 'ALSA MIDI Note'
+    OnClick = ButtonAlsaSeqNoteClick
+    TabOrder = 3
+  end
+  object ButtonDevTtyBell: TButton
+    Left = 16
+    Height = 31
+    Top = 192
+    Width = 132
+    Caption = '/dev/tty Bell'
+    OnClick = ButtonDevTtyBellClick
+    TabOrder = 4
+  end
+  object ButtonDevTtyIoctlBell: TButton
+    Left = 16
+    Height = 31
+    Top = 320
+    Width = 132
+    Caption = '/dev/tty ioctl() Bell'
+    OnClick = ButtonDevTtyIoctlBellClick
+    TabOrder = 5
+  end
+  object ButtonStdoutBeep: TButton
     Left = 164
     Height = 33
-    Top = 160
+    Top = 128
     Width = 132
-    Caption = 'ALSA MIDI Beep'
-    OnClick = ButtonAlsaSeqBeepClick
-    TabOrder = 3
+    Caption = 'Stdout Beep'
+    OnClick = ButtonStdoutBeepClick
+    TabOrder = 6
+  end
+  object ButtonDevTtyBeep: TButton
+    Left = 164
+    Height = 31
+    Top = 192
+    Width = 132
+    Caption = '/dev/tty Beep'
+    OnClick = ButtonDevTtyBeepClick
+    TabOrder = 7
+  end
+  object ButtonDefaultBeep: TButton
+    Left = 164
+    Height = 31
+    Top = 64
+    Width = 132
+    Caption = 'Default Beep'
+    OnClick = ButtonDefaultBeepClick
+    TabOrder = 8
+  end
+  object ButtonStdoutIoctlBell: TButton
+    Left = 16
+    Height = 31
+    Top = 256
+    Width = 132
+    Caption = 'Stdout ioctl() Bell'
+    OnClick = ButtonStdoutIoctlBellClick
+    TabOrder = 9
+  end
+  object ButtonStdoutIoctlBeep: TButton
+    Left = 164
+    Height = 31
+    Top = 256
+    Width = 132
+    Caption = 'Stdout ioctl() Beep'
+    OnClick = ButtonStdoutIoctlBeepClick
+    TabOrder = 10
+  end
+  object ButtonDevTtyIoctlBeep: TButton
+    Left = 164
+    Height = 31
+    Top = 320
+    Width = 132
+    Caption = '/dev/tty ioctl() Beep'
+    OnClick = ButtonDevTtyIoctlBeepClick
+    TabOrder = 11
   end
 end
