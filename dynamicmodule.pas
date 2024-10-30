@@ -17,7 +17,7 @@ type
     *)
     class function IsDynamic(): boolean; inline;
   strict private
-    FModuleHandle: THandle;
+    FModuleHandle: TLibHandle;
     FAlreadyInMemory: BOOLEAN;
     FModuleName: string;
     FLoadError: string;
@@ -25,7 +25,7 @@ type
     (* Case-sensitivity depends on the operating system and filesystem.
     *)
     procedure SetModuleName(const Value: string);
-    function GetModuleHandle(): THandle;
+    function GetModuleHandle(): TLibHandle;
     procedure UnloadModule;
   public
     class function GetLoadErrorStr(): string;
@@ -47,7 +47,7 @@ type
     *)
     function RoutineExists(const Name: string): Boolean;
     property ModuleName: string read FModuleName write SetModuleName;
-    property ModuleHandle: THandle read GetModuleHandle;
+    property ModuleHandle: TLibHandle read GetModuleHandle;
     property ModuleInMemory: boolean read FAlreadyInMemory;
     property LoadError: string read FLoadError;
     property LastError: string read FLastError;
@@ -81,7 +81,7 @@ begin
 end { TDynamicModule.SetModuleName } ;
 
 
-function TDynamicModule.GetModuleHandle(): THandle;
+function TDynamicModule.GetModuleHandle(): TLibHandle;
 
 begin
   LoadModule;
