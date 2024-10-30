@@ -129,8 +129,11 @@ type
 
 (* Is the underlying ALSA library linked statically or dynamically?
 *)
-
 function IsDynamic(): boolean;
+
+(* Is the underlying ALSA library in memory?
+*)
+function ModuleInMemory(): boolean;
 
 
 implementation
@@ -652,12 +655,20 @@ end { TMidiWriterThread.ParseMidiAndEmit } ;
 
 (* Is the underlying ALSA library linked statically or dynamically?
 *)
-
 function IsDynamic(): boolean;
 
 begin
   result := AsoundSeq.IsDynamic
 end { IsDynamic } ;
+
+
+(* Is the underlying ALSA library in memory?
+*)
+function ModuleInMemory(): boolean;
+
+begin
+  result := AsoundSeq.ModuleInMemory
+end { ModuleInMemory } ;
 
 
 end.

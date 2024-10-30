@@ -36,6 +36,7 @@ var
 function BeepSeq(const tune: string= 'c050 !127 +660 A6'): boolean;
 
 begin
+  Result := ModuleInMemory;
   if not hasInitialisedMidi then begin
     MidiWriterThread := TMidiWriterThread.Create(false, 'BeepDemo');
     Application.ProcessMessages;
