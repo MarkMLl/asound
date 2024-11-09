@@ -170,3 +170,4 @@ initialization
 finalization
   FreeAndNil(xAsound)
 end.
+// MD5 079212c673918b0ff020353170f23a47 149da9002573b52acfd4489b6c37102f ANSI LF {}

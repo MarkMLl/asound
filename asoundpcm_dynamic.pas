@@ -242,3 +242,4 @@ initialization
 finalization
   FreeAndNil(xAsoundPcm)
 end.
+// MD5 449dc65bc7230888ebea23df1627dd15 1c0a05463760a65ba0f860e5700e0a03 ANSI LF {}
