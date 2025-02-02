@@ -1,4 +1,5 @@
-// unit THIS LINE NEEDED FOR DECLARATION HINTING TO WORK
+// unit THIS LINE IS NEEDED FOR THE LAZARUS IDE'S DECLARATION HINTING TO WORK.
+
 (* Return either a static or a dynamic representation of the Asound embedding
   library (libasound.a or similar). In this case it is static.
 *)
@@ -10,13 +11,27 @@ unit Asound;
 (*                                                                              *)
 (********************************************************************************)
 
-{$mode objfpc}{$H+}
-{$packrecords C}
-
 (*
  * Please refer to AsoundDefs.inc and other accompanying files for
  * licensing and disclaimer information.
  *)
+
+{$mode ObjFPC }{$longstrings on }
+
+{$push }
+{$macro on }
+{$define CDECL__:= cdecl; }
+{$define CDECL_VARARGS__:= cdecl varargs; }
+{$define LIBASOUND__:= external 'libasound'; }
+{$define _LIBASOUND__:= asound }
+{$undef DYNAMIC }
+
+{$define EARLY  }
+{$undef CONSTS  }
+{$undef TYPES   }
+{$undef PROCS   }
+{$undef VPROCS  }
+{$i AsoundDefs.inc }
 
 interface
 
@@ -29,36 +44,35 @@ const
   HasLoadVarargsRoutine= true;          (* Presence is implementation-defined   *)
 
 const
+
   (* The Asound libraries are statically linked, always return false.
   *)
   IsDynamic= false;
+
   (* The Asound libraries are statically linked, if the program has started
     successfully then they must be in memory.
   *)
   ModuleInMemory= true;
 
-{$undef DYNAMIC }
+{$undef EARLY   }
 {$define CONSTS }
 {$undef TYPES   }
 {$undef PROCS   }
 {$undef VPROCS  }
 {$i AsoundDefs.inc }
 
+{$undef EARLY   }
 {$undef CONSTS  }
 {$define TYPES  }
 {$undef PROCS   }
 {$undef VPROCS  }
 {$i AsoundDefs.inc }
 
-{$push }
-{$macro on }
+{$undef EARLY   }
 {$undef CONSTS  }
 {$undef TYPES   }
 {$define PROCS  }
 {$define VPROCS }
-{$define CDECL__:= cdecl; }
-{$define CDECL_VARARGS__:= cdecl varargs; }
-{$define LIBASOUND__:= external 'libasound'; }
 {$i AsoundDefs.inc }
 {$pop }
 
@@ -115,4 +129,4 @@ end { LoadVarargsRoutine } ;
 
 
 end.
-// MD5 079212c673918b0ff020353170f23a47 56da58748119ecc03d9285801062ff99 ANSI LF {}
+// MD5 3673724605e7aac61fe03aa5546da321 3d1ae494cc676ebdae352babe8e77a83 ANSI LF {}

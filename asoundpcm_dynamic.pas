@@ -6,13 +6,27 @@ unit AsoundPcm_dynamic;
 (*                                                                              *)
 (********************************************************************************)
 
-{$mode objfpc}{$H+}
-{$packrecords C}
-
 (*
  * Please refer to AsoundPcmDefs.inc and other accompanying files for
  * licensing and disclaimer information.
  *)
+
+{$mode ObjFPC }{$longstrings on }
+
+{$push }
+{$macro on }
+{$define CDECL__:= }
+{$define CDECL_VARARGS__:= }
+{$define LIBASOUND__:= }
+{$define _LIBASOUND__:= asound }
+{$define DYNAMIC }
+
+{$define EARLY  }
+{$undef CONSTS  }
+{$undef TYPES   }
+{$undef PROCS   }
+{$undef VPROCS  }
+{$i AsoundPcmDefs.inc }
 
 interface
 
@@ -24,13 +38,14 @@ const
   DefaultEarlyLoad= true;
   HasLoadVarargsRoutine= true;          (* Presence is implementation-defined   *)
 
-{$define DYNAMIC }
+{$undef EARLY   }
 {$define CONSTS }
 {$undef TYPES   }
 {$undef PROCS   }
 {$undef VPROCS  }
 {$i AsoundPcmDefs.inc }
 
+{$undef EARLY   }
 {$undef CONSTS  }
 {$define TYPES  }
 {$undef PROCS   }
@@ -67,15 +82,11 @@ type
     *)
     constructor Create(const LoadName: string);
     procedure LoadVarargsRoutine(loadName: string= ''; keepGoing: boolean= false);
-    {$push }
-    {$macro on }
+    {$undef EARLY  }
     {$undef CONSTS }
     {$undef TYPES  }
     {$define PROCS }
     {$undef VPROCS }
-    {$define CDECL__:= }
-    {$define CDECL_VARARGS__:= }
-    {$define LIBASOUND__:= }
     {$i AsoundPcmDefs.inc }
     {$pop }
   end;
@@ -242,4 +253,4 @@ initialization
 finalization
   FreeAndNil(xAsoundPcm)
 end.
-// MD5 449dc65bc7230888ebea23df1627dd15 1c0a05463760a65ba0f860e5700e0a03 ANSI LF {}
+// MD5 8a3a909554b541a742b57df6e9c0cb01 9a7c7158391d67a527a4ecb90ffd03a2 ANSI LF {}
